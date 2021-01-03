@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 void main() {
   runApp(
@@ -9,12 +12,26 @@ void main() {
   );
 }
 
-class ChooseTime extends StatelessWidget{
+class MyClock extends StatelessWidget{
 
   @override
   Widget build(BuildContext context){
-    return Center(
-      child: Text('Aldasda'),
+    return Column(
+      children: <Widget>[
+        Expanded(
+          child: Container(),
+        ),
+        Expanded(
+          child: Container(
+            width: MediaQuery.of(context).size.width/4.0*3,
+            color: Colors.lightGreen,
+            child: Text("Place for clock"),
+          )
+        ),
+        Expanded(
+          child: Container(),
+        ),
+      ]
     );
   }
 }
@@ -25,13 +42,24 @@ class MyButton extends StatelessWidget{
   final buttonString;
   final VoidCallback onPressed;
 
+  final buttonColor = Colors.blue;
+
   @override
   Widget build(BuildContext context){
-    return IconButton(
-      icon: Text(buttonString),
-      onPressed: onPressed,
-      iconSize: 100,
-      alignment: Alignment.center,
+    return Container(
+      height: 50,
+      width: 150,
+      decoration: BoxDecoration(
+        color: buttonString == "Start" ? null : buttonColor,
+        border: Border.all(
+          color: buttonColor,
+          width: 2,
+        ),
+      ),
+      child: FlatButton(
+        child: Text(buttonString),
+        onPressed: onPressed,
+      )
     );
   }
 }
@@ -42,6 +70,12 @@ class MyApp extends StatefulWidget{
 }
 
 class _MyAppState extends State<MyApp>{
+
+  Timer timer;
+
+  _MyAppState(){
+    timer = new Timer.periodic(new Duration(seconds: 1), _increment);
+  }
 
   var buttonString = "Start";
   int seconds = 0;
@@ -55,37 +89,56 @@ class _MyAppState extends State<MyApp>{
     });
   }
 
-  void _increment() {
-    setState(() {
-      //do sth
-    });
+  void _increment(Timer timer) {
+    if (countActive) {
+      setState(() {
+        seconds++;
+      });
+    }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('MyApp'),
-        ),
+          backgroundColor: Colors.deepOrange,
+          title: Center(
+            child: Text(seconds.toString()),
+            ),
+          ),
         body: Center(
             child: Column(
                 children: <Widget>[
-                  Container(
-                    child: ChooseTime(),
-                    height: 100,
-                  ),
+                  //Clock part
                   Expanded(
-                      child: Container(
-                        color: Colors.red,
-                        width: 100,
-                      )
+                    flex: 4,
+                    child: MyClock(),
                   ),
-                  Container(
-                    child: MyButton(
-                      buttonString: buttonString,
-                      onPressed: changeString,
-                    ),
+                  //Button part
+                  Expanded(
+                    flex: 1,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            child: Container(color: Colors.red,),
+                          ),
+                           Container(
+                             height: 50,
+                             width: 150,
+                             child: MyButton(
+                               buttonString: buttonString,
+                               onPressed: changeString,
+                             ),
+                           ),
+                          Expanded(
+                            child: Container(color: Colors.red,),
+                          )
+
+                        ]
+                      ),
                   ),
                 ]
             )
