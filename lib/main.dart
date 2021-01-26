@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:audioplayers/audio_cache.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:screen/screen.dart';
 
 void main() {
@@ -16,8 +18,14 @@ class MyClock extends StatelessWidget {
   final VoidCallback minusButton;
   final countActive;
   final myText;
+  final myHeight;
 
-  MyClock({this.seconds, this.addButton, this.minusButton, this.countActive})
+  MyClock(
+      {this.seconds,
+      this.addButton,
+      this.minusButton,
+      this.countActive,
+      this.myHeight})
       : myText = ((seconds / 60).floor() < 10 ? '0' : '') +
             (seconds / 60).floor().toString() +
             ':' +
@@ -33,51 +41,56 @@ class MyClock extends StatelessWidget {
           child: Container(),
         ),
         Expanded(
-            flex: 2,
+            flex: 3,
             child: Container(
+                height: myHeight / 2.0,
                 child: Column(children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey,
-                  shape: BoxShape.circle,
-                  border: Border.all(
+                  Container(
+                    height: myHeight / 9.0,
+                    width: myHeight / 9.0,
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white60,
+                        width: 2,
+                      ),
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.add, size: myHeight / 27.0),
                       color: Colors.white60,
-                    width: 2,
-                  ),
-                ),
-                child: IconButton(
-                  icon: Icon(Icons.add),
-                  color: Colors.white60,
-                  onPressed: addButton,
-                ),
-              ),
-              Expanded(
-                child: Center(
-                  child: Text(
-                    (seconds / 60).floor().toString(),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 100,
+                      onPressed: addButton,
                     ),
                   ),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.blueGrey,
-                  border: Border.all(
-                    color: Colors.white60,
-                    width: 2,
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        (seconds / 60).floor().toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: myHeight / 5.0,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-                child: IconButton(
-                  icon: Icon(Icons.remove),
-                  color: Colors.white60,
-                  onPressed: minusButton,
-                ),
-              ),
-            ]))),
+                  Container(
+                    height: myHeight / 9.0,
+                    width: myHeight / 9.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.blueGrey,
+                      border: Border.all(
+                        color: Colors.white60,
+                        width: 2,
+                      ),
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.remove, size: myHeight / 27.0),
+                      color: Colors.white60,
+                      onPressed: minusButton,
+                    ),
+                  ),
+                ]))),
         Expanded(
           child: Container(),
         ),
@@ -88,7 +101,7 @@ class MyClock extends StatelessWidget {
         myText,
         style: TextStyle(
           color: Colors.white,
-          fontSize: 100,
+          fontSize: myHeight / 5.0,
         ),
       ),
     );
@@ -96,53 +109,71 @@ class MyClock extends StatelessWidget {
 }
 
 class MyButton extends StatelessWidget {
-  MyButton({this.buttonString, this.onPressed});
+  MyButton({this.buttonString, this.onPressed, this.myHeight, this.myWidth});
 
   final buttonString;
   final VoidCallback onPressed;
+  final myHeight;
+  final myWidth;
 
   final buttonColor = Colors.white;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 50,
-        width: 150,
-        decoration: BoxDecoration(
-          color: buttonString == "Start" ? null : buttonColor,
-          border: Border.all(
-            color: buttonColor,
-            width: 2,
-          ),
-        ),
-        child: FlatButton(
-          child: Text(buttonString),
-          onPressed: onPressed,
-        ));
+        height: myHeight,
+        child: Center(
+            child: Container(
+                height: myHeight / 2.0,
+                width: myWidth,
+                decoration: BoxDecoration(
+                  color: buttonString == "Start" ? null : buttonColor,
+                  border: Border.all(
+                    color: buttonColor,
+                    width: 2,
+                  ),
+                ),
+                child: FlatButton(
+                  child: Text(buttonString,
+                      style: TextStyle(
+                          color: buttonString == "Start" ? Colors.white : Colors.black,
+                          fontSize: myHeight / 6.0)),
+                  onPressed: onPressed,
+                ))));
   }
 }
 
 class MySwitch extends StatelessWidget {
-  MySwitch({this.darkenScreen, this.onChanged});
+  MySwitch({this.darkenScreen, this.onChanged, this.myHeight, this.myWidth});
 
   final bool darkenScreen;
   final void Function(bool) onChanged;
+  final myHeight;
+  final myWidth;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 80,
+      height: myHeight,
       child: Column(children: [
         Expanded(child: Container()),
-        Switch(
+        Container(
+          height: myHeight/2.0,
+          width: myWidth,
+        child: Switch(
+          inactiveThumbColor: Colors.white60,
+          //inactiveTrackColor: Colors.grey,
           activeColor: Colors.white,
           value: darkenScreen,
           onChanged: onChanged,
         ),
+        ),
         Text('Darken screen',
             style: TextStyle(
+              fontSize: myHeight / 6.0,
               color: Colors.white70,
-            ))
+            )),
+        Expanded(child: Container()),
       ]),
     );
   }
@@ -159,7 +190,7 @@ class _MyAppState extends State<MyApp> {
   int secondsToCount = 60;
   int minutesSet = 1;
   bool countActive = false;
-  bool darkenScreen = false;
+  bool darkenScreen = true;
   AudioCache audio = AudioCache();
   var buttonString = "Start";
 
@@ -242,13 +273,14 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: Colors.blueGrey,
         body: Column(children: <Widget>[
           //Clock part
-          Expanded(
-            flex: 3,
+          Container(
+            height: MediaQuery.of(context).size.height * 0.75,
             child: MyClock(
               seconds: secondsToCount,
               addButton: addMinute,
               minusButton: substractMinute,
               countActive: countActive,
+              myHeight: MediaQuery.of(context).size.height * 0.75,
             ),
           ),
           //Button part
@@ -257,8 +289,15 @@ class _MyAppState extends State<MyApp> {
               MyButton(
                 buttonString: buttonString,
                 onPressed: startStopCounter,
+                myHeight: MediaQuery.of(context).size.height * 0.125,
+                myWidth: MediaQuery.of(context).size.width / 3.0,
               ),
-              MySwitch(darkenScreen: darkenScreen, onChanged: changeDarken)
+              MySwitch(
+                darkenScreen: darkenScreen,
+                onChanged: changeDarken,
+                myHeight: MediaQuery.of(context).size.height * 0.125,
+                myWidth: MediaQuery.of(context).size.width/6.0,
+              )
             ]),
           ),
         ]),
